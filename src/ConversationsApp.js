@@ -25,6 +25,7 @@ class ConversationsApp extends React.Component {
     this.state = {
       token: null,
       loggedIn,
+      showModal,
       statusString: null,
       conversationsReady: false,
       conversations: [],
@@ -39,6 +40,14 @@ class ConversationsApp extends React.Component {
       this.setState({ statusString: "Fetching credentials…" });
     }
   };
+
+  showModalHandler = (event) => {
+    this.setState({ showModal: true });
+  }
+
+  hideModalHandler = (event) => {
+    this.setState({ showModal: false });
+  }
 
   logIn = async (identity, email, password) => {
     if (identity !== "" && email !== "" && password !== "") {
@@ -169,6 +178,17 @@ class ConversationsApp extends React.Component {
                   <Text strong style={{ color: "white" }}>
                     Conversations
                   </Text>
+                </HeaderItem>
+                <HeaderItem>
+                  <Icon
+                    type="plus"
+                    onClick={this.showModalHandler}
+                    style={{
+                      color: "white",
+                      fontSize: "20px",
+                      marginLeft: "auto"
+                    }}
+                  />
                 </HeaderItem>
               </div>
               <div style={{ display: "flex", width: "100%" }}>
