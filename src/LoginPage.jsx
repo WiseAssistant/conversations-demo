@@ -13,8 +13,8 @@ export class LoginPage extends React.Component {
     form.validateFields((err, values) => {
       if (!err) {
         debugger;
-        const { username } = values;
-        onSubmit(username);
+        const { identity, email, password } = values;
+        onSubmit(identity, email, password);
       }
     });
   };
@@ -22,8 +22,16 @@ export class LoginPage extends React.Component {
   render() {
     const { getFieldDecorator } = this.props.form;
 
-    const usernameFieldDecorator = getFieldDecorator("username", {
-      rules: [{ required: true, message: "Please input your username!" }]
+    const identityFieldDecorator = getFieldDecorator("identity", {
+      rules: [{ required: true, message: "Please input your identity!" }]
+    });
+
+    const emailFieldDecorator = getFieldDecorator("email", {
+      rules: [{ required: true, message: "Please input your email!" }]
+    });
+
+    const passwordFieldDecorator = getFieldDecorator("password", {
+      rules: [{ required: true, message: "Please input your password!" }]
     });
 
     return (
@@ -48,7 +56,7 @@ export class LoginPage extends React.Component {
 
                 <Form onSubmit={this.handleSubmit}>
                   <Form.Item>
-                    {usernameFieldDecorator(
+                    {identityFieldDecorator(
                       <Input
                         prefix={
                           <Icon
@@ -56,7 +64,33 @@ export class LoginPage extends React.Component {
                             style={{ color: "rgba(0,0,0,.25)" }}
                           />
                         }
-                        placeholder="Username"
+                        placeholder="identity"
+                      />
+                    )}
+                  </Form.Item>
+                  <Form.Item>
+                    {emailFieldDecorator(
+                      <Input
+                        prefix={
+                          <Icon
+                            type="user"
+                            style={{ color: "rgba(0,0,0,.25)" }}
+                          />
+                        }
+                        placeholder="Eemail"
+                      />
+                    )}
+                  </Form.Item>
+                  <Form.Item>
+                    {passwordFieldDecorator(
+                      <Input
+                        prefix={
+                          <Icon
+                            type="user"
+                            style={{ color: "rgba(0,0,0,.25)" }}
+                          />
+                        }
+                        placeholder="password"
                       />
                     )}
                   </Form.Item>

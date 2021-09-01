@@ -8,6 +8,7 @@ import { ReactComponent as Logo } from "./assets/twilio-mark-red.svg";
 
 import Conversation from "./Conversation";
 import LoginPage from "./LoginPage";
+import getRefreshedToken from "./api";
 import { ConversationsList } from "./ConversationsList";
 import { HeaderItem } from "./HeaderItem";
 
@@ -22,9 +23,7 @@ class ConversationsApp extends React.Component {
     const loggedIn = name !== "";
 
     this.state = {
-      identity: null,
-      emailAddress: null,
-      password: null,
+      token: null,
       loggedIn,
       token: null,
       statusString: null,
@@ -47,10 +46,10 @@ class ConversationsApp extends React.Component {
       localStorage.setItem("identity", identity);
       localStorage.setItem("email", email);
       localStorage.setItem("password", password);
-      getRefreshedToken();
+      var token = getRefreshedToken(email, password, identity);
       this.setState(
-        { identity, email, password, loggedIn: true },
-        this.getToken
+        { token, loggedIn: true },
+        this.initConversations
       );
     }
   };
@@ -74,12 +73,6 @@ class ConversationsApp extends React.Component {
     this.conversationsClient.shutdown();
   };
 
-  getToken = () => {
-    // Paste your unique Chat token function
-    const myToken =
-      "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCIsImN0eSI6InR3aWxpby1mcGE7dj0xIn0.eyJqdGkiOiJTSzg2YTNhNjhmOGVkZDY5NmI1ODE1NGM0NTI2ZjYzODc3LTE2MzA0NTY0MDAiLCJncmFudHMiOnsiaWRlbnRpdHkiOiJtaWNoYWVsIiwiY2hhdCI6eyJzZXJ2aWNlX3NpZCI6IklTOThmYTUzN2FjYWVjNDRhYmI1YTYwZjQ2MGRiMjUyNTMifX0sImlhdCI6MTYzMDQ1NjQwMCwiZXhwIjoxNjMwNTQyODAwLCJpc3MiOiJTSzg2YTNhNjhmOGVkZDY5NmI1ODE1NGM0NTI2ZjYzODc3Iiwic3ViIjoiQUMyMTdiM2VlZjZhNzA4ZGNiOGE4YmExM2Q2YzUyYjA2ZiJ9.1cl5jZDGERs0OSL9gAbVO5q-9jkxoNvhlumUscr3CxA";
-    this.setState({ token: myToken }, this.initConversations);
-  };
 
   initConversations = async () => {
     window.conversationsClient = ConversationsClient;
