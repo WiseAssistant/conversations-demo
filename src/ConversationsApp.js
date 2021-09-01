@@ -22,7 +22,9 @@ class ConversationsApp extends React.Component {
     const loggedIn = name !== "";
 
     this.state = {
-      name,
+      identity: null,
+      emailAddress: null,
+      password: null,
       loggedIn,
       token: null,
       statusString: null,
@@ -40,10 +42,16 @@ class ConversationsApp extends React.Component {
     }
   };
 
-  logIn = (name) => {
-    if (name !== "") {
-      localStorage.setItem("name", name);
-      this.setState({ name, loggedIn: true }, this.getToken);
+  logIn = (identity, email, password) => {
+    if (identity !== "" && email !== "" && password !== "") {
+      localStorage.setItem("identity", identity);
+      localStorage.setItem("email", email);
+      localStorage.setItem("password", password);
+      getRefreshedToken();
+      this.setState(
+        { identity, email, password, loggedIn: true },
+        this.getToken
+      );
     }
   };
 
@@ -68,13 +76,16 @@ class ConversationsApp extends React.Component {
 
   getToken = () => {
     // Paste your unique Chat token function
-    const myToken = "<Your token here>";
+    const myToken =
+      "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCIsImN0eSI6InR3aWxpby1mcGE7dj0xIn0.eyJqdGkiOiJTSzg2YTNhNjhmOGVkZDY5NmI1ODE1NGM0NTI2ZjYzODc3LTE2MzA0NTY0MDAiLCJncmFudHMiOnsiaWRlbnRpdHkiOiJtaWNoYWVsIiwiY2hhdCI6eyJzZXJ2aWNlX3NpZCI6IklTOThmYTUzN2FjYWVjNDRhYmI1YTYwZjQ2MGRiMjUyNTMifX0sImlhdCI6MTYzMDQ1NjQwMCwiZXhwIjoxNjMwNTQyODAwLCJpc3MiOiJTSzg2YTNhNjhmOGVkZDY5NmI1ODE1NGM0NTI2ZjYzODc3Iiwic3ViIjoiQUMyMTdiM2VlZjZhNzA4ZGNiOGE4YmExM2Q2YzUyYjA2ZiJ9.1cl5jZDGERs0OSL9gAbVO5q-9jkxoNvhlumUscr3CxA";
     this.setState({ token: myToken }, this.initConversations);
   };
 
   initConversations = async () => {
     window.conversationsClient = ConversationsClient;
-    this.conversationsClient = await ConversationsClient.create(this.state.token);
+    this.conversationsClient = await ConversationsClient.create(
+      this.state.token
+    );
     this.setState({ statusString: "Connecting to Twilio…" });
 
     this.conversationsClient.on("connectionStateChanged", (state) => {
@@ -109,11 +120,15 @@ class ConversationsApp extends React.Component {
         });
     });
     this.conversationsClient.on("conversationJoined", (conversation) => {
-      this.setState({ conversations: [...this.state.conversations, conversation] });
+      this.setState({
+        conversations: [...this.state.conversations, conversation]
+      });
     });
     this.conversationsClient.on("conversationLeft", (thisConversation) => {
       this.setState({
-        conversations: [...this.state.conversations.filter((it) => it !== thisConversation)]
+        conversations: [
+          ...this.state.conversations.filter((it) => it !== thisConversation)
+        ]
       });
     });
   };
@@ -166,7 +181,8 @@ class ConversationsApp extends React.Component {
                 <HeaderItem>
                   <Text strong style={{ color: "white" }}>
                     {selectedConversation &&
-                      (selectedConversation.friendlyName || selectedConversation.sid)}
+                      (selectedConversation.friendlyName ||
+                        selectedConversation.sid)}
                   </Text>
                 </HeaderItem>
                 <HeaderItem style={{ float: "right", marginLeft: "auto" }}>

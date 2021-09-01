@@ -4,6 +4,7 @@
   "private": true,
   "proxy": "http://localhost:3001",
   "dependencies": {
+    "axios": "0.21.1",
     "@twilio/conversations": "1.2.0",
     "antd": "^3.26.20",
     "ngrok": "^3.4.0",
@@ -78,12 +79,7 @@
   "eslintConfig": {
     "extends": "react-app"
   },
-  "browserslist": [
-    ">0.2%",
-    "not dead",
-    "not ie <= 11",
-    "not op_mini all"
-  ],
+  "browserslist": [">0.2%", "not dead", "not ie <= 11", "not op_mini all"],
   "keywords": [],
   "description": ""
 }
