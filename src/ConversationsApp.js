@@ -25,7 +25,6 @@ class ConversationsApp extends React.Component {
     this.state = {
       token: null,
       loggedIn,
-      token: null,
       statusString: null,
       conversationsReady: false,
       conversations: [],
@@ -41,17 +40,20 @@ class ConversationsApp extends React.Component {
     }
   };
 
-  logIn = (identity, email, password) => {
+  logIn = async (identity, email, password) => {
     if (identity !== "" && email !== "" && password !== "") {
       localStorage.setItem("identity", identity);
       localStorage.setItem("email", email);
       localStorage.setItem("password", password);
-      var token = getRefreshedToken(email, password, identity);
-      this.setState(
-        { token, loggedIn: true },
-        this.initConversations
-      );
+      debugger;
+      var token = await this.getToken(identity, email, password);
+      debugger;
+      this.setState({ token, loggedIn: true }, this.initConversations);
     }
+  };
+
+  getToken = async (identity, email, password) => {
+    return await getRefreshedToken(email, password, identity);
   };
 
   logOut = (event) => {
@@ -72,7 +74,6 @@ class ConversationsApp extends React.Component {
     localStorage.removeItem("name");
     this.conversationsClient.shutdown();
   };
-
 
   initConversations = async () => {
     window.conversationsClient = ConversationsClient;

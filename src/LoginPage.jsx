@@ -5,14 +5,13 @@ import { ReactComponent as Logo } from "./assets/twilio-mark-red.svg";
 const { Content } = Layout;
 
 export class LoginPage extends React.Component {
-  handleSubmit = (e) => {
+  handleSubmit = async (e) => {
     e.preventDefault();
 
     const { form, onSubmit } = this.props;
 
     form.validateFields((err, values) => {
       if (!err) {
-        debugger;
         const { identity, email, password } = values;
         onSubmit(identity, email, password);
       }
@@ -73,11 +72,11 @@ export class LoginPage extends React.Component {
                       <Input
                         prefix={
                           <Icon
-                            type="user"
+                            type="mail"
                             style={{ color: "rgba(0,0,0,.25)" }}
                           />
                         }
-                        placeholder="Eemail"
+                        placeholder="Email"
                       />
                     )}
                   </Form.Item>
@@ -86,7 +85,7 @@ export class LoginPage extends React.Component {
                       <Input
                         prefix={
                           <Icon
-                            type="user"
+                            type="lock"
                             style={{ color: "rgba(0,0,0,.25)" }}
                           />
                         }
