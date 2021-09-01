@@ -1,5 +1,10 @@
 const axios = require("axios");
 
+const headers = {
+  "Content-Type": "text/plain",
+  "Access-Control-Allow-Origin": "*"
+};
+
 export default async function getRefreshedToken(
   emailAddress,
   password,
@@ -12,7 +17,8 @@ export default async function getRefreshedToken(
       identity: identity
     })
     .then((response) => {
-      return response;
+      return response.data.token;
     });
+  debugger;
   return token;
 }
