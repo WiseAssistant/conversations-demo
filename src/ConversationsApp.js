@@ -8,6 +8,7 @@ import { ReactComponent as Logo } from "./assets/twilio-mark-red.svg";
 
 import Conversation from "./Conversation";
 import LoginPage from "./LoginPage";
+import FormModal from "./FormModal";
 import getRefreshedToken from "./api";
 import { ConversationsList } from "./ConversationsList";
 import { HeaderItem } from "./HeaderItem";
@@ -25,7 +26,7 @@ class ConversationsApp extends React.Component {
     this.state = {
       token: null,
       loggedIn,
-      showModal,
+      showModal: false,
       statusString: null,
       conversationsReady: false,
       conversations: [],
@@ -42,12 +43,13 @@ class ConversationsApp extends React.Component {
   };
 
   showModalHandler = (event) => {
+    debugger;
     this.setState({ showModal: true });
-  }
+  };
 
   hideModalHandler = (event) => {
     this.setState({ showModal: false });
-  }
+  };
 
   logIn = async (identity, email, password) => {
     if (identity !== "" && email !== "" && password !== "") {
@@ -232,6 +234,10 @@ class ConversationsApp extends React.Component {
                   }}
                 />
               </Sider>
+              <FormModal
+                showModal={this.state.showModal}
+                hideModalHandler={this.hideModalHandler}
+              ></FormModal>
               <Content className="conversation-section">
                 <div id="SelectedConversation">{conversationContent}</div>
               </Content>
