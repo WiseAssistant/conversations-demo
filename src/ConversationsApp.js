@@ -8,8 +8,8 @@ import { ReactComponent as Logo } from "./assets/twilio-mark-red.svg";
 
 import Conversation from "./Conversation";
 import LoginPage from "./LoginPage";
-import FormModal from "./FormModal";
-import getRefreshedToken from "./api";
+import Modal from "react-modal";
+import { getRefreshedToken, createConversation } from "./api";
 import { ConversationsList } from "./ConversationsList";
 import { HeaderItem } from "./HeaderItem";
 
@@ -20,9 +20,10 @@ class ConversationsApp extends React.Component {
   constructor(props) {
     super(props);
 
-    const name = localStorage.getItem("name") || "";
-    const loggedIn = name !== "";
-
+    const token = localStorage.getItem("token") || "";
+    const loggedIn = token !== "";
+    this.handleChange = this.handleChange.bind(this);
+    this.createConversation = this.createConversation.bind(this);
     this.state = {
       token: null,
       loggedIn,
@@ -31,19 +32,23 @@ class ConversationsApp extends React.Component {
       conversationsReady: false,
       conversations: [],
       selectedConversationSid: null,
-      newMessage: ""
+      newMessage: "",
+      create_number: ""
     };
   }
 
   componentDidMount = () => {
     if (this.state.loggedIn) {
-      this.getToken();
       this.setState({ statusString: "Fetching credentials…" });
+      var token = this.state.token;
+      if (!token) {
+        token = localStorage.getItem("token");
+      }
+      this.setState({ token: token }, this.initConversations);
     }
   };
 
   showModalHandler = (event) => {
-    debugger;
     this.setState({ showModal: true });
   };
 
@@ -56,10 +61,12 @@ class ConversationsApp extends React.Component {
       localStorage.setItem("identity", identity);
       localStorage.setItem("email", email);
       localStorage.setItem("password", password);
-      debugger;
       var token = await this.getToken(identity, email, password);
-      debugger;
-      this.setState({ token, loggedIn: true }, this.initConversations);
+      localStorage.setItem("token", token);
+      this.setState(
+        { token, loggedIn: true, conversationsReady: true },
+        this.initConversations
+      );
     }
   };
 
@@ -67,26 +74,46 @@ class ConversationsApp extends React.Component {
     return await getRefreshedToken(email, password, identity);
   };
 
+  handleChange(event) {
+    this.setState({ create_number: event.target.create_number });
+  }
+
   logOut = (event) => {
     if (event) {
       event.preventDefault();
     }
 
     this.setState({
-      name: "",
+      token: null,
       loggedIn: false,
-      token: "",
+      showModal: false,
+      statusString: null,
       conversationsReady: false,
-      messages: [],
+      conversations: [],
+      selectedConversationSid: null,
       newMessage: "",
-      conversations: []
+      create_number: ""
     });
 
-    localStorage.removeItem("name");
-    this.conversationsClient.shutdown();
+    localStorage.removeItem("identity");
+    localStorage.removeItem("email");
+    localStorage.removeItem("password");
+    if (this.conversationsClient != null) {
+      this.conversationsClient.shutdown();
+    }
+  };
+
+  createConversation = (event) => {
+    debugger;
+    const identity = localStorage.getItem("identity");
+    const token = localStorage.getItem("token");
+    createConversation(token, this.state.create_number, identity);
+    this.setState({ create_number: "" }, this.initConversations);
+    event.preventDefault();
   };
 
   initConversations = async () => {
+    debugger;
     window.conversationsClient = ConversationsClient;
     this.conversationsClient = await ConversationsClient.create(
       this.state.token
@@ -237,21 +264,23 @@ class ConversationsApp extends React.Component {
               <div>
                 <Modal
                   isOpen={this.state.showModal}
-                  onRequestClose={this.hideModalHandler}
-                  contentLabel="Example Modal"
+                  contentLabel="Create Conversation"
                 >
-                  <h2 ref={(_subtitle) => (subtitle = _subtitle)}>Hello</h2>
-                  <button onClick={closeModal}>close</button>
-                  <div>I am a modal</div>
-                  <form>
-                    <input />
-                    <button>tab navigation</button>
-                    <button>stays</button>
-                    <button>inside</button>
-                    <button>the modal</button>
+                  <div>
+                    Enter the number you wish to create a conversation with in
+                    the format +1XXXXXXXXXX
+                  </div>
+                  <form onSubmit={this.createConversation}>
+                    <input
+                      type="text"
+                      value={this.state.create_number}
+                      onChange={this.handleChange}
+                    />
+                    <input type="submit" value="submit" />
                   </form>
+                  <button onClick={this.hideModalHandler}>cancel</button>
                 </Modal>
-              </div>;
+              </div>
               <Content className="conversation-section">
                 <div id="SelectedConversation">{conversationContent}</div>
               </Content>
