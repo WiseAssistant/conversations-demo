@@ -162,16 +162,19 @@ class ConversationsApp extends React.Component {
     });
     this.conversationsClient.on("conversationAdded", (conversation) => {
       debugger;
-      if (!this.state.conversations.includes(conversation)) {
-        this.setState({
-          conversations: [...this.state.conversations, conversation]
-        });
-      }
-    });
-    this.conversationsClient.on("conversationRemoved", (thisConversation) => {
       this.setState({
         conversations: [
-          ...this.state.conversations.filter((it) => it !== thisConversation)
+          ...this.state.conversations.filter(
+            (it) => it.entityName !== conversation.entityName
+          ),
+          conversation
+        ]
+      });
+    });
+    this.conversationsClient.on("conversationRemoved", (conversation) => {
+      this.setState({
+        conversations: [
+          ...this.state.conversations.filter((it) => it !== conversation)
         ]
       });
     });
