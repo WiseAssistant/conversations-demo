@@ -33,7 +33,7 @@ class ConversationsApp extends React.Component {
       conversations: [],
       selectedConversationSid: null,
       newMessage: "",
-      create_number: ""
+      createNumber: ""
     };
   }
 
@@ -75,7 +75,8 @@ class ConversationsApp extends React.Component {
   };
 
   handleChange(event) {
-    this.setState({ create_number: event.target.create_number });
+    this.setState({ createNumber: event.target.value });
+    event.preventDefault();
   }
 
   logOut = (event) => {
@@ -107,13 +108,12 @@ class ConversationsApp extends React.Component {
     debugger;
     const identity = localStorage.getItem("identity");
     const token = localStorage.getItem("token");
-    createConversation(token, this.state.create_number, identity);
-    this.setState({ create_number: "" }, this.initConversations);
+    createConversation(token, this.state.createNumber, identity);
+    this.setState({ createNumber: "" }, this.initConversations);
     event.preventDefault();
   };
 
   initConversations = async () => {
-    debugger;
     window.conversationsClient = ConversationsClient;
     this.conversationsClient = await ConversationsClient.create(
       this.state.token
@@ -273,7 +273,7 @@ class ConversationsApp extends React.Component {
                   <form onSubmit={this.createConversation}>
                     <input
                       type="text"
-                      value={this.state.create_number}
+                      value={this.state.createNumber}
                       onChange={this.handleChange}
                     />
                     <input type="submit" value="submit" />
