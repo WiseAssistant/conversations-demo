@@ -15,6 +15,12 @@ import { HeaderItem } from "./HeaderItem";
 
 const { Content, Sider, Header } = Layout;
 const { Text } = Typography;
+const style = {
+  position: "fixed",
+  top: "50%",
+  left: "50%",
+  transform: "translate(-50%, -50%)"
+};
 
 class ConversationsApp extends React.Component {
   constructor(props) {
@@ -109,7 +115,10 @@ class ConversationsApp extends React.Component {
     const identity = localStorage.getItem("identity");
     const token = localStorage.getItem("token");
     createConversation(token, this.state.createNumber, identity);
-    this.setState({ createNumber: "" }, this.initConversations);
+    this.setState(
+      { createNumber: "", showModal: false },
+      this.initConversations
+    );
     event.preventDefault();
   };
 
@@ -118,7 +127,7 @@ class ConversationsApp extends React.Component {
     this.conversationsClient = await ConversationsClient.create(
       this.state.token
     );
-    this.setState({ statusString: "Connecting to Twilio…" });
+    this.setState({ statusString: "Connecting to Twilio…", conversations: [] });
 
     this.conversationsClient.on("connectionStateChanged", (state) => {
       if (state === "connecting")
@@ -265,6 +274,12 @@ class ConversationsApp extends React.Component {
                 <Modal
                   isOpen={this.state.showModal}
                   contentLabel="Create Conversation"
+                  style={{
+                    position: "fixed",
+                    top: "50%",
+                    left: "50%",
+                    transform: "translate(-50%, -50%)"
+                  }}
                 >
                   <div>
                     Enter the number you wish to create a conversation with in
