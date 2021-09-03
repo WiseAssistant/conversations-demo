@@ -116,7 +116,7 @@ class ConversationsApp extends React.Component {
     const token = localStorage.getItem("token");
     createConversation(token, this.state.createNumber, identity);
     this.setState(
-      { createNumber: "", showModal: false },
+      { createNumber: "", showModal: false, conversations: [] },
       this.initConversations
     );
     event.preventDefault();
@@ -160,12 +160,15 @@ class ConversationsApp extends React.Component {
           status: "error"
         });
     });
-    this.conversationsClient.on("conversationJoined", (conversation) => {
-      this.setState({
-        conversations: [...this.state.conversations, conversation]
-      });
+    this.conversationsClient.on("conversationAdded", (conversation) => {
+      debugger;
+      if (!this.state.conversations.includes(conversation)) {
+        this.setState({
+          conversations: [...this.state.conversations, conversation]
+        });
+      }
     });
-    this.conversationsClient.on("conversationLeft", (thisConversation) => {
+    this.conversationsClient.on("conversationRemoved", (thisConversation) => {
       this.setState({
         conversations: [
           ...this.state.conversations.filter((it) => it !== thisConversation)
