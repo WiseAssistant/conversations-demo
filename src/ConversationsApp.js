@@ -274,12 +274,7 @@ class ConversationsApp extends React.Component {
                 <Modal
                   isOpen={this.state.showModal}
                   contentLabel="Create Conversation"
-                  style={{
-                    position: "fixed",
-                    top: "50%",
-                    left: "50%",
-                    transform: "translate(-50%, -50%)"
-                  }}
+                  style={style}
                 >
                   <div>
                     Enter the number you wish to create a conversation with in

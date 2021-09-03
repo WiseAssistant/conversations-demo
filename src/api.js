@@ -21,3 +21,9 @@ export const createConversation = async (token, phone_number, identity) => {
     identity: identity
   });
 };
+
+export const deleteConversation = async (conversation_sid) => {
+  await axios.delete(
+    `https://backend.gogetwise.com/sms/conversation/delete/${conversation_sid}/`
+  );
+};

@@ -1,23 +1,26 @@
 import MessageBubble from "./MessageBubble";
-import React, {PureComponent} from "react";
+import React, { PureComponent } from "react";
 import PropTypes from "prop-types";
 
 class ConversationsMessages extends PureComponent {
   render = () => {
     return (
-        <div id="messages">
-          <ul>
-            { this.props.messages.map(m => {
-              if (m.author === this.props.identity)
-                return <MessageBubble key={m.index} direction="outgoing" message={m} />;
-              else
-                return <MessageBubble key={m.index} direction="incoming" message={m} />;
-            })
-            }
-          </ul>
-        </div>
+      <div id="messages">
+        <ul>
+          {this.props.messages.map((m) => {
+            if (m.author === this.props.identity)
+              return (
+                <MessageBubble key={m.index} direction="outgoing" message={m} />
+              );
+            else
+              return (
+                <MessageBubble key={m.index} direction="incoming" message={m} />
+              );
+          })}
+        </ul>
+      </div>
     );
-  }
+  };
 }
 
 ConversationsMessages.propTypes = {
