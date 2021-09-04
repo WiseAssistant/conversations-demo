@@ -65,7 +65,8 @@
     "request-promise": "^4.2.6",
     "rollup": "^2.7.2",
     "rollup-plugin-executable": "^1.5.3",
-    "twilio": "^3.67.1"
+    "twilio": "^3.67.1",
+    "@material-ui/core":"4.12.3"
   },
   "devDependencies": {
     "concurrently": "^3.6.1"

@@ -1,6 +1,6 @@
 import React, { Fragment } from "react";
 import { List, Typography } from "antd";
-
+import { Badge } from '@material-ui/core';
 import conversationsListStyles from "./assets/ConversationsList.module.css";
 import conversationsItemStyles from "./assets/ConversationsItem.module.css";
 import { deleteConversation } from "./api";
