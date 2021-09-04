@@ -3,7 +3,7 @@ import { List, Typography, Icon } from "antd";
 import { Badge } from "@material-ui/core";
 import conversationsListStyles from "./assets/ConversationsList.module.css";
 import conversationsItemStyles from "./assets/ConversationsItem.module.css";
-import { deleteConversation, getUnseenMessagesNumber } from "./api";
+import { deleteConversation } from "./api";
 import { joinClassNames } from "./utils/class-name";
 import Modal from "react-modal";
 
@@ -46,6 +46,7 @@ export class ConversationsList extends React.Component {
     const {
       conversations,
       selectedConversationSid,
+      conversationsUnseenNumbers,
       onConversationClick
     } = this.props;
 
@@ -69,10 +70,16 @@ export class ConversationsList extends React.Component {
               activeChannel &&
                 conversationsItemStyles["conversation-item--active"]
             ]);
+            var found = conversationsUnseenNumbers.find(
+              (element) => element.sid === item.sid
+            );
+            if (found === undefined) {
+              found = { unseenMessages: 0 };
+            }
             debugger;
             return (
               <Badge
-                badgeContent={item.unseenMessages}
+                badgeContent={found.unseenMessages}
                 color="error"
                 style={{ paddingLeft: "20px" }}
                 id={item.sid}

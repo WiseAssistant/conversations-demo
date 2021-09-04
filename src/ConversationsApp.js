@@ -45,6 +45,7 @@ class ConversationsApp extends React.Component {
       statusString: null,
       conversationsReady: false,
       conversations: [],
+      conversationUnseenNumbers: [],
       selectedConversationSid: null,
       newMessage: "",
       createNumber: ""
@@ -105,6 +106,7 @@ class ConversationsApp extends React.Component {
       statusString: null,
       conversationsReady: false,
       conversations: [],
+      conversationUnseenNumbers: [],
       selectedConversationSid: null,
       newMessage: "",
       create_number: ""
@@ -131,17 +133,15 @@ class ConversationsApp extends React.Component {
   };
 
   updateConversationUnseenMessages = async () => {
-    debugger;
     this.state.conversations.forEach(async (conversation) => {
-      conversation.unseenMessages = await getUnseenMessagesNumber(
-        conversation.sid
-      );
+      const unseenMessages = await getUnseenMessagesNumber(conversation.sid);
+      debugger;
       this.setState({
-        conversations: [
-          ...this.state.conversations.filter(
-            (it) => it.entityName !== conversation.entityName
+        conversationUnseenNumbers: [
+          ...this.state.conversationUnseenNumbers.filter(
+            (it) => it.sid !== conversation.entityName
           ),
-          conversation
+          { sid: conversation.sid, unseenMessages: unseenMessages }
         ]
       });
     });
@@ -203,11 +203,15 @@ class ConversationsApp extends React.Component {
         ]
       });
     });
-    await this.updateConversationUnseenMessages();
   };
 
   render() {
-    const { conversations, selectedConversationSid, status } = this.state;
+    const {
+      conversations,
+      selectedConversationSid,
+      status,
+      conversationUnseenNumbers
+    } = this.state;
     const selectedConversation = conversations.find(
       (it) => it.sid === selectedConversationSid
     );
@@ -281,6 +285,17 @@ class ConversationsApp extends React.Component {
                 </HeaderItem>
                 <HeaderItem>
                   <Icon
+                    type="reload"
+                    onClick={this.updateConversationUnseenMessages}
+                    style={{
+                      color: "white",
+                      fontSize: "20px",
+                      marginLeft: "auto"
+                    }}
+                  />
+                </HeaderItem>
+                <HeaderItem>
+                  <Icon
                     type="poweroff"
                     onClick={this.logOut}
                     style={{
@@ -296,6 +311,7 @@ class ConversationsApp extends React.Component {
               <Sider theme={"light"} width={250}>
                 <ConversationsList
                   conversations={conversations}
+                  conversationsUnseenNumbers={conversationUnseenNumbers}
                   selectedConversationSid={selectedConversationSid}
                   onConversationClick={(item) => {
                     updateLastSeenMessage(item.sid);
