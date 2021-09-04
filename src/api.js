@@ -27,3 +27,15 @@ export const deleteConversation = async (conversation_sid) => {
     `https://backend.gogetwise.com/sms/conversation/delete/${conversation_sid}/`
   );
 };
+
+export const updateLastSeenMessage = async (conversation_sid) => {
+  await axios.patch(
+    `https://backend.gogetwise.com/sms/conversation/${conversation_sid}/unseen/update/`
+  );
+};
+
+export const getUnseenMessagesNumber = async (conversation_sid) => {
+  await axios.get(
+    `https://backend.gogetwise.com/sms/conversation/${conversation_sid}/unseen/`
+  );
+};
