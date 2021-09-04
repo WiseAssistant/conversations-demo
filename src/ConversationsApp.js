@@ -9,7 +9,12 @@ import { ReactComponent as Logo } from "./assets/twilio-mark-red.svg";
 import Conversation from "./Conversation";
 import LoginPage from "./LoginPage";
 import Modal from "react-modal";
-import { getRefreshedToken, createConversation } from "./api";
+import {
+  getRefreshedToken,
+  createConversation,
+  updateLastSeenMessage,
+  getUnseenMessagesNumber
+} from "./api";
 import { ConversationsList } from "./ConversationsList";
 import { HeaderItem } from "./HeaderItem";
 
@@ -30,6 +35,9 @@ class ConversationsApp extends React.Component {
     const loggedIn = token !== "";
     this.handleChange = this.handleChange.bind(this);
     this.createConversation = this.createConversation.bind(this);
+    this.updateConversationUnseenMessages = this.updateConversationUnseenMessages.bind(
+      this
+    );
     this.state = {
       token: null,
       loggedIn,
@@ -122,6 +130,23 @@ class ConversationsApp extends React.Component {
     event.preventDefault();
   };
 
+  updateConversationUnseenMessages = async () => {
+    debugger;
+    this.state.conversations.forEach(async (conversation) => {
+      conversation.unseenMessages = await getUnseenMessagesNumber(
+        conversation.sid
+      );
+      this.setState({
+        conversations: [
+          ...this.state.conversations.filter(
+            (it) => it.entityName !== conversation.entityName
+          ),
+          conversation
+        ]
+      });
+    });
+  };
+
   initConversations = async () => {
     window.conversationsClient = ConversationsClient;
     this.conversationsClient = await ConversationsClient.create(
@@ -171,13 +196,14 @@ class ConversationsApp extends React.Component {
         ]
       });
     });
-    this.conversationsClient.on("conversationRemoved", (conversation) => {
+    this.conversationsClient.on("conversationRemoved", (thisConversation) => {
       this.setState({
         conversations: [
-          ...this.state.conversations.filter((it) => it !== conversation)
+          ...this.state.conversations.filter((it) => it !== thisConversation)
         ]
       });
     });
+    await this.updateConversationUnseenMessages();
   };
 
   render() {
@@ -272,6 +298,7 @@ class ConversationsApp extends React.Component {
                   conversations={conversations}
                   selectedConversationSid={selectedConversationSid}
                   onConversationClick={(item) => {
+                    updateLastSeenMessage(item.sid);
                     this.setState({ selectedConversationSid: item.sid });
                   }}
                 />

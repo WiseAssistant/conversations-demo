@@ -1,9 +1,9 @@
 import React, { Fragment } from "react";
-import { List, Typography } from "antd";
-import { Badge } from '@material-ui/core';
+import { List, Typography, Icon } from "antd";
+import { Badge } from "@material-ui/core";
 import conversationsListStyles from "./assets/ConversationsList.module.css";
 import conversationsItemStyles from "./assets/ConversationsItem.module.css";
-import { deleteConversation } from "./api";
+import { deleteConversation, getUnseenMessagesNumber } from "./api";
 import { joinClassNames } from "./utils/class-name";
 import Modal from "react-modal";
 
@@ -32,7 +32,7 @@ export class ConversationsList extends React.Component {
     debugger;
     this.setState({
       showDeleteModal: true,
-      deleteConversationSid: event.target.attributes.value.value
+      deleteConversationSid: event.currentTarget.value
     });
     event.preventDefault();
   };
@@ -69,23 +69,33 @@ export class ConversationsList extends React.Component {
               activeChannel &&
                 conversationsItemStyles["conversation-item--active"]
             ]);
-
+            debugger;
             return (
-              <List.Item
-                key={item.sid}
-                onClick={() => onConversationClick(item)}
-                className={conversationItemClassName}
+              <Badge
+                badgeContent={item.unseenMessages}
+                color="error"
+                style={{ paddingLeft: "20px" }}
+                id={item.sid}
               >
-                <Text
-                  strong
-                  className={conversationsItemStyles["conversation-item-text"]}
+                <List.Item
+                  key={item.sid}
+                  onClick={() => onConversationClick(item)}
+                  className={conversationItemClassName}
                 >
-                  {item.friendlyName || item.sid}
-                </Text>
-                <button onClick={this.showModalHandler} value={item.sid}>
-                  Delete
-                </button>
-              </List.Item>
+                  <Text
+                    strong
+                    className={
+                      conversationsItemStyles["conversation-item-text"]
+                    }
+                    style={{ paddingRight: "30px" }}
+                  >
+                    {item.friendlyName || item.sid}
+                  </Text>
+                  <button onClick={this.showModalHandler} value={item.sid}>
+                    <Icon type="delete" />
+                  </button>
+                </List.Item>
+              </Badge>
             );
           }}
         />

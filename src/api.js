@@ -35,7 +35,11 @@ export const updateLastSeenMessage = async (conversation_sid) => {
 };
 
 export const getUnseenMessagesNumber = async (conversation_sid) => {
-  await axios.get(
-    `https://backend.gogetwise.com/sms/conversation/${conversation_sid}/unseen/`
-  );
+  return await axios
+    .get(
+      `https://backend.gogetwise.com/sms/conversation/${conversation_sid}/unseen/`
+    )
+    .then((response) => {
+      return response.data.unseen_messages;
+    });
 };
