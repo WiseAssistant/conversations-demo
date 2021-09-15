@@ -74,7 +74,7 @@ export class ConversationsList extends React.Component {
               (element) => element.sid === item.sid
             );
             if (found === undefined) {
-              found = { unseenMessages: 0 };
+              found = { unseenMessages: ""};
             }
             debugger;
             return (
