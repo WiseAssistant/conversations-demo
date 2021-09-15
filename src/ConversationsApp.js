@@ -199,6 +199,7 @@ class ConversationsApp extends React.Component {
           conversation
         ]
       });
+      this.updateConversationUnseenMessages();
     });
     this.conversationsClient.on("conversationRemoved", (thisConversation) => {
       this.setState({
