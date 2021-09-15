@@ -136,17 +136,17 @@ class ConversationsApp extends React.Component {
     event.preventDefault();
   };
 
-  updateConversationUnseenMessages = async () => {
+  updateConversationUnseenMessages = () => {
     this.state.conversations.forEach(async (conversation) => {
-      const unseenMessages = await getUnseenMessagesNumber(conversation.sid);
-      debugger;
-      this.setState({
-        conversationUnseenNumbers: [
-          ...this.state.conversationUnseenNumbers.filter(
-            (it) => it.sid !== conversation.entityName
-          ),
-          { sid: conversation.sid, unseenMessages: unseenMessages }
-        ]
+      getUnseenMessagesNumber(conversation.sid).then((unseenMessages) => {
+        this.setState({
+          conversationUnseenNumbers: [
+            ...this.state.conversationUnseenNumbers.filter(
+              (it) => it.sid !== conversation.sid
+            ),
+            { sid: conversation.sid, unseenMessages: unseenMessages }
+          ]
+        });
       });
     });
   };
@@ -206,6 +206,10 @@ class ConversationsApp extends React.Component {
           ...this.state.conversations.filter((it) => it !== thisConversation)
         ]
       });
+    });
+    this.conversationsClient.on("messageAdded", (conversation) => {
+      debugger;
+      this.updateConversationUnseenMessages();
     });
   };
 
