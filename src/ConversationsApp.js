@@ -199,7 +199,6 @@ class ConversationsApp extends React.Component {
           conversation
         ]
       });
-      this.updateConversationUnseenMessages();
     });
     this.conversationsClient.on("conversationRemoved", (thisConversation) => {
       this.setState({
@@ -324,6 +323,7 @@ class ConversationsApp extends React.Component {
                   selectedConversationSid={selectedConversationSid}
                   onConversationClick={(item) => {
                     updateLastSeenMessage(item.sid);
+                    this.updateConversationUnseenMessages();
                     this.setState({ selectedConversationSid: item.sid });
                   }}
                 />
