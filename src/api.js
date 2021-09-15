@@ -20,20 +20,20 @@ export const createConversation = async (token, phone_number, identity) => {
     token: token,
     phone_number: phone_number,
     identity: identity
-  }, { headers: { "Authorization": "Token " + session_key } });
+  }, { headers: { "Authorization": `Token ${session_key}` } });
 };
 
 export const deleteConversation = async (conversation_sid) => {
   const session_key = localStorage.get("session_key");
   await axios.delete(
-    `https://backend.gogetwise.com/sms/conversation/delete/${conversation_sid}/`, { headers: { "Authorization": "Token " + session_key } }
+    `https://backend.gogetwise.com/sms/conversation/delete/${conversation_sid}/`, { headers: { "Authorization": `Token ${session_key}` } }
   );
 };
 
 export const updateLastSeenMessage = async (conversation_sid) => {
   const session_key = localStorage.get("session_key");
   await axios.patch(
-    `https://backend.gogetwise.com/sms/conversation/${conversation_sid}/unseen/update/`, { headers: { "Authorization": "Token " + session_key } }
+    `https://backend.gogetwise.com/sms/conversation/${conversation_sid}/unseen/update/`, { headers: { "Authorization": `Token ${session_key}` } }
   );
 };
 
@@ -42,7 +42,7 @@ export const getUnseenMessagesNumber = async (conversation_sid) => {
   const session_key = localStorage.get("session_key");
   return await axios
     .get(
-      `https://backend.gogetwise.com/sms/conversation/${conversation_sid}/unseen/`, { headers: { "Authorization": "Token " + session_key } })
+      `https://backend.gogetwise.com/sms/conversation/${conversation_sid}/unseen/`, { headers: { "Authorization": `Token ${session_key}` } })
         .then((response) => {
           return response.data.unseen_messages;
         });
