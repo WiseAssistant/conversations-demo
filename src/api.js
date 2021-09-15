@@ -8,7 +8,7 @@ export const getRefreshedToken = async (emailAddress, password, identity) => {
       identity: identity
     })
     .then((response) => {
-      return response.data.token;
+      return {token: response.data.token, session_key:response.data.session_key};
     });
   debugger;
   return token;

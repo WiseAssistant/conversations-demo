@@ -76,8 +76,10 @@ class ConversationsApp extends React.Component {
       localStorage.setItem("identity", identity);
       localStorage.setItem("email", email);
       localStorage.setItem("password", password);
-      var token = await this.getToken(identity, email, password);
-      localStorage.setItem("token", token);
+      var authObj = await this.getToken(identity, email, password);
+      localStorage.setItem("token", authObj.token);
+      localStorage.setItem("session_key", authObj.session_key);
+
       this.setState(
         { token, loggedIn: true, conversationsReady: true },
         this.initConversations
@@ -115,6 +117,8 @@ class ConversationsApp extends React.Component {
     localStorage.removeItem("identity");
     localStorage.removeItem("email");
     localStorage.removeItem("password");
+    localStorage.removeItem("token");
+    localStorage.removeItem("session_key");
     if (this.conversationsClient != null) {
       this.conversationsClient.shutdown();
     }
