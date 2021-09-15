@@ -42,7 +42,7 @@ export const getUnseenMessagesNumber = async (conversation_sid) => {
   session_key = localStorage.get("session_key");
   return await axios
     .get(
-      `https://backend.gogetwise.com/sms/conversation/${conversation_sid}/unseen/`, { headers: { "Authorization": "Token " + session_key } }
+      `https://backend.gogetwise.com/sms/conversation/${conversation_sid}/unseen/`, { headers: { "Authorization": "Token " + session_key } })
         .then((response) => {
           return response.data.unseen_messages;
         });
