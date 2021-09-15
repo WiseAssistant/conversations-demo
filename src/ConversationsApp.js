@@ -81,7 +81,7 @@ class ConversationsApp extends React.Component {
       localStorage.setItem("session_key", authObj.session_key);
 
       this.setState(
-        { token, loggedIn: true, conversationsReady: true },
+        { token: authObj.token, loggedIn: true, conversationsReady: true },
         this.initConversations
       );
     }
