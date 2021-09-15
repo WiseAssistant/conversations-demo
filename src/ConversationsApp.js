@@ -8,44 +8,93 @@ import { ReactComponent as Logo } from "./assets/twilio-mark-red.svg";
 
 import Conversation from "./Conversation";
 import LoginPage from "./LoginPage";
+import Modal from "react-modal";
+import {
+  getRefreshedToken,
+  createConversation,
+  updateLastSeenMessage,
+  getUnseenMessagesNumber
+} from "./api";
 import { ConversationsList } from "./ConversationsList";
 import { HeaderItem } from "./HeaderItem";
 
 const { Content, Sider, Header } = Layout;
 const { Text } = Typography;
+const style = {
+  position: "fixed",
+  top: "50%",
+  left: "50%",
+  transform: "translate(-50%, -50%)"
+};
 
 class ConversationsApp extends React.Component {
   constructor(props) {
     super(props);
 
-    const name = localStorage.getItem("name") || "";
-    const loggedIn = name !== "";
-
+    const token = localStorage.getItem("token") || "";
+    const loggedIn = token !== "";
+    this.handleChange = this.handleChange.bind(this);
+    this.createConversation = this.createConversation.bind(this);
+    this.updateConversationUnseenMessages = this.updateConversationUnseenMessages.bind(
+      this
+    );
     this.state = {
-      name,
-      loggedIn,
       token: null,
+      loggedIn,
+      showModal: false,
       statusString: null,
       conversationsReady: false,
       conversations: [],
+      conversationUnseenNumbers: [],
       selectedConversationSid: null,
-      newMessage: ""
+      newMessage: "",
+      createNumber: ""
     };
   }
 
   componentDidMount = () => {
     if (this.state.loggedIn) {
-      this.getToken();
       this.setState({ statusString: "Fetching credentials…" });
+      var token = this.state.token;
+      if (!token) {
+        token = localStorage.getItem("token");
+      }
+      this.setState({ token: token }, this.initConversations);
     }
   };
 
-  logIn = (name) => {
-    if (name !== "") {
-      localStorage.setItem("name", name);
-      this.setState({ name, loggedIn: true }, this.getToken);
+  showModalHandler = (event) => {
+    this.setState({ showModal: true });
+  };
+
+  hideModalHandler = (event) => {
+    this.setState({ showModal: false });
+  };
+
+  logIn = async (identity, email, password) => {
+    if (identity !== "" && email !== "" && password !== "") {
+      localStorage.setItem("identity", identity);
+      localStorage.setItem("email", email);
+      localStorage.setItem("password", password);
+      var authObj = await this.getToken(identity, email, password);
+      localStorage.setItem("token", authObj.token);
+      localStorage.setItem("session_key", authObj.session_key);
+
+      this.setState(
+        { token: authObj.token, loggedIn: true, conversationsReady: true },
+        this.initConversations
+      );
     }
   };
+
+  getToken = async (identity, email, password) => {
+    return await getRefreshedToken(email, password, identity);
+  };
+
+  handleChange(event) {
+    this.setState({ createNumber: event.target.value });
+    event.preventDefault();
+  }
 
   logOut = (event) => {
     if (event) {
@@ -53,29 +102,61 @@ class ConversationsApp extends React.Component {
     }
 
     this.setState({
-      name: "",
+      token: null,
       loggedIn: false,
-      token: "",
+      showModal: false,
+      statusString: null,
       conversationsReady: false,
-      messages: [],
+      conversations: [],
+      conversationUnseenNumbers: [],
+      selectedConversationSid: null,
       newMessage: "",
-      conversations: []
+      create_number: ""
     });
 
-    localStorage.removeItem("name");
-    this.conversationsClient.shutdown();
+    localStorage.removeItem("identity");
+    localStorage.removeItem("email");
+    localStorage.removeItem("password");
+    localStorage.removeItem("token");
+    localStorage.removeItem("session_key");
+    if (this.conversationsClient != null) {
+      this.conversationsClient.shutdown();
+    }
   };
 
-  getToken = () => {
-    // Paste your unique Chat token function
-    const myToken = "<Your token here>";
-    this.setState({ token: myToken }, this.initConversations);
+  createConversation = (event) => {
+    debugger;
+    const identity = localStorage.getItem("identity");
+    const token = localStorage.getItem("token");
+    createConversation(token, this.state.createNumber, identity);
+    this.setState(
+      { createNumber: "", showModal: false, conversations: [] },
+      this.initConversations
+    );
+    event.preventDefault();
+  };
+
+  updateConversationUnseenMessages = async () => {
+    this.state.conversations.forEach(async (conversation) => {
+      const unseenMessages = await getUnseenMessagesNumber(conversation.sid);
+      debugger;
+      this.setState({
+        conversationUnseenNumbers: [
+          ...this.state.conversationUnseenNumbers.filter(
+            (it) => it.sid !== conversation.entityName
+          ),
+          { sid: conversation.sid, unseenMessages: unseenMessages }
+        ]
+      });
+    });
   };
 
   initConversations = async () => {
     window.conversationsClient = ConversationsClient;
-    this.conversationsClient = await ConversationsClient.create(this.state.token);
-    this.setState({ statusString: "Connecting to Twilio…" });
+    this.conversationsClient = await ConversationsClient.create(
+      this.state.token
+    );
+    this.setState({ statusString: "Connecting to Twilio…", conversations: [] });
 
     this.conversationsClient.on("connectionStateChanged", (state) => {
       if (state === "connecting")
@@ -108,18 +189,33 @@ class ConversationsApp extends React.Component {
           status: "error"
         });
     });
-    this.conversationsClient.on("conversationJoined", (conversation) => {
-      this.setState({ conversations: [...this.state.conversations, conversation] });
-    });
-    this.conversationsClient.on("conversationLeft", (thisConversation) => {
+    this.conversationsClient.on("conversationAdded", (conversation) => {
+      debugger;
       this.setState({
-        conversations: [...this.state.conversations.filter((it) => it !== thisConversation)]
+        conversations: [
+          ...this.state.conversations.filter(
+            (it) => it.entityName !== conversation.entityName
+          ),
+          conversation
+        ]
+      });
+    });
+    this.conversationsClient.on("conversationRemoved", (thisConversation) => {
+      this.setState({
+        conversations: [
+          ...this.state.conversations.filter((it) => it !== thisConversation)
+        ]
       });
     });
   };
 
   render() {
-    const { conversations, selectedConversationSid, status } = this.state;
+    const {
+      conversations,
+      selectedConversationSid,
+      status,
+      conversationUnseenNumbers
+    } = this.state;
     const selectedConversation = conversations.find(
       (it) => it.sid === selectedConversationSid
     );
@@ -161,12 +257,24 @@ class ConversationsApp extends React.Component {
                     Conversations
                   </Text>
                 </HeaderItem>
+                <HeaderItem>
+                  <Icon
+                    type="plus"
+                    onClick={this.showModalHandler}
+                    style={{
+                      color: "white",
+                      fontSize: "20px",
+                      marginLeft: "auto"
+                    }}
+                  />
+                </HeaderItem>
               </div>
               <div style={{ display: "flex", width: "100%" }}>
                 <HeaderItem>
                   <Text strong style={{ color: "white" }}>
                     {selectedConversation &&
-                      (selectedConversation.friendlyName || selectedConversation.sid)}
+                      (selectedConversation.friendlyName ||
+                        selectedConversation.sid)}
                   </Text>
                 </HeaderItem>
                 <HeaderItem style={{ float: "right", marginLeft: "auto" }}>
@@ -177,6 +285,17 @@ class ConversationsApp extends React.Component {
                     dot={true}
                     status={this.state.status}
                     style={{ marginLeft: "1em" }}
+                  />
+                </HeaderItem>
+                <HeaderItem>
+                  <Icon
+                    type="reload"
+                    onClick={this.updateConversationUnseenMessages}
+                    style={{
+                      color: "white",
+                      fontSize: "20px",
+                      marginLeft: "auto"
+                    }}
                   />
                 </HeaderItem>
                 <HeaderItem>
@@ -196,12 +315,35 @@ class ConversationsApp extends React.Component {
               <Sider theme={"light"} width={250}>
                 <ConversationsList
                   conversations={conversations}
+                  conversationsUnseenNumbers={conversationUnseenNumbers}
                   selectedConversationSid={selectedConversationSid}
                   onConversationClick={(item) => {
+                    updateLastSeenMessage(item.sid);
                     this.setState({ selectedConversationSid: item.sid });
                   }}
                 />
               </Sider>
+              <div>
+                <Modal
+                  isOpen={this.state.showModal}
+                  contentLabel="Create Conversation"
+                  style={style}
+                >
+                  <div>
+                    Enter the number you wish to create a conversation with in
+                    the format +1XXXXXXXXXX
+                  </div>
+                  <form onSubmit={this.createConversation}>
+                    <input
+                      type="text"
+                      value={this.state.createNumber}
+                      onChange={this.handleChange}
+                    />
+                    <input type="submit" value="submit" />
+                  </form>
+                  <button onClick={this.hideModalHandler}>cancel</button>
+                </Modal>
+              </div>
               <Content className="conversation-section">
                 <div id="SelectedConversation">{conversationContent}</div>
               </Content>

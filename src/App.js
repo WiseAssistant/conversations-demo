@@ -1,17 +1,16 @@
-import React, { Component } from 'react';
-import ConversationsApp from './ConversationsApp';
-import './assets/App.css';
-import 'antd/dist/antd.css';
-
+import React, { Component } from "react";
+import ConversationsApp from "./ConversationsApp";
+import "./assets/App.css";
+import "antd/dist/antd.css";
 
 class App extends Component {
   constructor(props) {
     super(props);
-    this.state = {}
+    this.state = {};
   }
 
   render() {
-    return <ConversationsApp />
+    return <ConversationsApp />;
   }
 }
 
