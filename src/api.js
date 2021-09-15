@@ -32,8 +32,8 @@ export const deleteConversation = async (conversation_sid) => {
 
 export const updateLastSeenMessage = async (conversation_sid) => {
   const session_key = localStorage.getItem("session_key");
-  await axios.patch(
-    `https://backend.gogetwise.com/sms/conversation/${conversation_sid}/unseen/update/`, {}, { headers: { "Authorization": `Token ${session_key}` } }
+  await axios.get(
+    `https://backend.gogetwise.com/sms/conversation/${conversation_sid}/unseen/update/`, { headers: { "Authorization": `Token ${session_key}` } }
   );
 };
 
