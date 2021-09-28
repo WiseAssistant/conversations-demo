@@ -190,14 +190,22 @@ class ConversationsApp extends React.Component {
         });
     });
     this.conversationsClient.on("conversationAdded", (conversation) => {
+      var conversations = this.state.conversations.filter(
+        (it) => it.entityName !== conversation.entityName
+      );
       debugger;
+      conversations.push(conversation);
+      conversations.sort((a, b) => {
+        if (a.dateUpdated < b.dateUpdated) {
+          return 1;
+        }
+        if (a.dateUpdated > b.dateUpdated) {
+          return -1;
+        }
+        return 0;
+      });
       this.setState({
-        conversations: [
-          ...this.state.conversations.filter(
-            (it) => it.entityName !== conversation.entityName
-          ),
-          conversation
-        ]
+        conversations: [...conversations]
       });
     });
     this.conversationsClient.on("conversationRemoved", (thisConversation) => {
