@@ -23,10 +23,11 @@ export const createConversation = async (token, phone_number, identity) => {
   }, { headers: { "Authorization": `Token ${session_key}` } });
 };
 
-export const deleteConversation = async (conversation_sid) => {
+export const archiveConversation = async (conversation_sid) => {
   const session_key = localStorage.getItem("session_key");
+  const identity = localStorage.getItem("identity");
   await axios.delete(
-    `https://backend.gogetwise.com/sms/conversation/delete/${conversation_sid}/`, { headers: { "Authorization": `Token ${session_key}` } }
+    `https://backend.gogetwise.com/sms/conversation/delete/${conversation_sid}/`, { identity: identity}, { headers: { "Authorization": `Token ${session_key}` } }
   );
 };
 

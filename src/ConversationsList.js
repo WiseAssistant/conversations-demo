@@ -3,7 +3,7 @@ import { List, Typography, Icon } from "antd";
 import { Badge } from "@material-ui/core";
 import conversationsListStyles from "./assets/ConversationsList.module.css";
 import conversationsItemStyles from "./assets/ConversationsItem.module.css";
-import { deleteConversation } from "./api";
+import { archiveConversation } from "./api";
 import { joinClassNames } from "./utils/class-name";
 import Modal from "react-modal";
 
@@ -23,7 +23,7 @@ export class ConversationsList extends React.Component {
   }
 
   async handleSubmit(event) {
-    deleteConversation(this.state.deleteConversationSid);
+    archiveConversation(this.state.deleteConversationSid);
     this.setState({ showDeleteModal: false, deleteConversationSid: null });
     event.preventDefault();
   }
